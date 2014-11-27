@@ -37,7 +37,7 @@ exercisesview.addEventListener('click', function(e) {
 });
 
 // get the muscle groups
-var groups = args.db.execute('SELECT * FROM groups ORDER BY name COLLATE NOCASE ASC');
+var groups = args.db.execute('SELECT * FROM groups ORDER BY name COLLATE NOCASE DESC');
 var i = 0;
 
 // create the buttons for the muscle groups
@@ -63,7 +63,7 @@ groupview.addEventListener('click', function (e) {
 	if (e.source.title != null)
 	{
 		// get the relevant ecercises from the database
-		var exercises = args.db.execute("SELECT * FROM list where muscle_group = ? ORDER BY name COLLATE NOCASE ASC", e.source.title);
+		var exercises = args.db.execute("SELECT * FROM list where muscle_group = ? ORDER BY name COLLATE NOCASE DESC", e.source.title);
 		var k = 0;
 		
 		// remove already existing buttons if any

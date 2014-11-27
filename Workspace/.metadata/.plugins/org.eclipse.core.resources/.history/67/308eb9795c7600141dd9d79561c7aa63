@@ -53,7 +53,7 @@ function list_workouts ()
 	var i = 0;
 	while (query.isValidRow())
 	{
-		var format_time = args.db.execute("SELECT strftime('%Y-%m-%d %H:%M', ?) as time", query.fieldByName('timestamp'));
+		var format_time = args.db.execute("strftime('%Y-%m-%d %H:%M', ?) as time", query.fieldByName('timestamp'));
 		var new_but =$.UI.create('Button', {
 		    top: 10 + i * 60,
 		    title: format_time.fieldByName('time'),
