@@ -3,7 +3,7 @@ var args = arguments[0] || {};
 
 // create a window and view for muscle groups
 var mainWin = Titanium.UI.createWindow({
-    backgroundColor:'#000000',
+    backgroundColor: '#F2F2F2',
     layout:'vertical',
     title: 'Muscle groups'
 });
@@ -11,12 +11,13 @@ var mainWin = Titanium.UI.createWindow({
 var groupview = Titanium.UI.createScrollView({
     scrollType:"vertical",
     left:'0dp',
-    width:'100%'
+    width:'100%',
+    height: '90%'
 });
 
 // create a window and view for exercises   
 var exercisesWin = Titanium.UI.createWindow({
-    backgroundColor:'#000000',
+    backgroundColor: '#F2F2F2',
     layout:'vertical',
     title: 'Exercises'
 });
@@ -94,7 +95,28 @@ groupview.addEventListener('click', function (e) {
 	}
 });
 
-// add the muscle groups view to the main window and open it
+var endview = Titanium.UI.createScrollView({
+    scrollType:"vertical",
+    bottom:'0dp',
+    width:'100%',
+    height: '10%'
+});
+
+var endBut = $.UI.create('Button', {
+    top: 0,
+    title: 'End Workout',
+    id: 'button'
+});
+
+endBut.addEventListener('click', function(e) {
+	Ti.App.fireEvent('workout_ended');
+	mainWin.close();
+});
+
+endview.add(endBut);
+
+// add the views to the main window and open it
 mainWin.add(groupview);
+mainWin.add(endview);
 mainWin.open();
 

@@ -5,7 +5,7 @@ var args = arguments[0] || {};
 if (typeof formsWin == 'undefined' ) 
 {
 	var formsWin = Titanium.UI.createWindow({
-	    backgroundColor:'#000000',
+	    backgroundColor: '#F2F2F2',
 	    layout:'vertical',
 	    title: args.title
 	});

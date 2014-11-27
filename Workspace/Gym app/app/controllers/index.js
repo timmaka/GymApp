@@ -3,49 +3,86 @@ var Tdb = Ti.Database.open ('_alloy_');
 Tdb.execute ('DROP TABLE IF EXISTS workouts');
 Tdb.close ();
 
-// WORK IN PROGRESS TO MAKE INDEX DYNAMIC AND TO STORE THE WORKOUT ID THAT IS PROGRESS
-// SO THAT THE APP CAN BE CLOSED WHILE THE WORKOUT IS IN PROGRESS
-// // create a window and view for muscle groups
-// var indexWin = Titanium.UI.createWindow({
-    // backgroundColor:'#000000',
-    // layout:'vertical',
-    // title: 'Gym App'
-// });
-// 
-// var indexView = Titanium.UI.createScrollView({
-    // scrollType:"vertical",
-    // left:'0dp',
-    // width:'100%'
-// });
+// create a window and view for muscle groups
+var indexWin = Titanium.UI.createWindow({
+    backgroundColor:'#F2F2F2',
+    layout:'vertical',
+    title: 'Gym App'
+});
 
-// var newBut = $.UI.create('Button', {
-    // top: 10 + k * 60,
-    // title: 'New Workout',
-    // id: 'button'
-// });
-// 
-// var continueBut = $.UI.create('Button', {
-    // top: 10 + k * 60,
-    // title: 'Continue Workout',
-    // id: 'button'
-// });
-// 
-// var pastBut = $.UI.create('Button', {
-    // top: 10 + k * 60,
-    // title: 'Past Workouts',
-    // id: 'button'
-// });
-// 
-// var addBut = $.UI.create('Button', {
-    // top: 10 + k * 60,
-    // title: 'Add exercise',
-    // id: 'button'
-// });
+var indexView = Titanium.UI.createScrollView({
+    scrollType:"vertical",
+    left:'0dp',
+    width:'100%'
+});
 
+var newBut = $.UI.create('Button', {
+    top: 10,
+    title: 'New Workout',
+    id: 'button'
+});
+
+newBut.addEventListener('click', function(e) {
+	newWorkout();
+});
+
+var continueBut = $.UI.create('Button', {
+    top: 10,
+    title: 'Continue Workout',
+    id: 'button'
+});
+
+continueBut.addEventListener('click', function(e) {
+	resume();
+});
+
+var pastBut = $.UI.create('Button', {
+    top: 70,
+    title: 'Past Workouts',
+    id: 'button'
+});
+
+pastBut.addEventListener('click', function(e) {
+	pastWorkouts();
+});
+
+var addBut = $.UI.create('Button', {
+    top: 130,
+    title: 'Add exercise',
+    id: 'button'
+});
+
+addBut.addEventListener('click', function(e) {
+	addexercise();
+});
+
+var endBut = $.UI.create('Button', {
+    top: 190,
+    title: 'End Workout',
+    id: 'button'
+});
+
+endBut.addEventListener('click', function(e) {
+	end_workout();
+});
 // open the database
 var db = Ti.Database.install('/database.db', 'gymdatabase');
 
+// get the last workout id if the last workout was started within 2 and a half hours
 var workout_id;
+var last_id = db.execute('SELECT * FROM current');
+if (last_id.isValidRow())
+{
+	var start = db.execute('SELECT timestamp from workouts where id = ?', last_id.fieldByName('current_workout'));
+	if (start.isValidRow())
+	{
+		var difference = db.execute("SELECT strftime('%s', datetime('now', 'localtime')) - strftime('%s',?) as diff", start.fieldByName('timestamp'));
+		if (difference.fieldByName('diff') <= 9000)
+		{
+			workout_id = last_id.fieldByName('current_workout');
+		}
+	}	
+}
 	
 function newWorkout (e)
 {
@@ -63,9 +100,20 @@ function newWorkout (e)
 		workout_id = 1;
 	}
 	
+	// update the database
+	db.execute('DELETE FROM current');
+	db.execute('INSERT INTO current (current_workout) VALUES (?)', workout_id);
+	var last_id = db.execute('SELECT * FROM current');
+	
 	// open the select window passing the database into it
 	var selectWin = Alloy.createController('select', {db:db, workout_id: workout_id}).getView(); 
+	
+	// modify the main screen
+	indexView.remove(newBut);
+	indexView.add(continueBut);
+	indexView.add(endBut);
 }
+
 function resume (e)
 {
 	if (typeof workout_id == 'undefined')
@@ -89,5 +137,31 @@ function addexercise (e)
 	var addView = Alloy.createController('add', {db:db}).getView();
 }
 
+function end_workout (e)
+{
+	db.execute('DELETE FROM current');
+	indexView.remove(continueBut);
+	indexView.add(newBut);
+	indexView.remove(endBut);
+}
+
+indexView.add(pastBut);
+indexView.add(addBut);
+
+if (typeof workout_id == 'undefined')
+{
+	indexView.add(newBut);
+}
+else
+{
+	indexView.add(continueBut);
+	indexView.add(endBut);
+}
+
+Ti.App.addEventListener('workout_ended', function(e){
+	end_workout();
+});
+
 // open the index window
-$.index.open();
+indexWin.add(indexView);
+indexWin.open();

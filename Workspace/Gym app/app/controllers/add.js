@@ -2,7 +2,7 @@ var args = arguments[0] || {};
 
 // create a window and view for adding   
 var addWin = Titanium.UI.createWindow({
-    backgroundColor:'#000000',
+    backgroundColor: '#F2F2F2',
     layout:'vertical',
     title: 'Add Exercise'
 });
@@ -13,34 +13,39 @@ var addView = Titanium.UI.createView({
 
 var label1 = Titanium.UI.createLabel({
     text: 'Muscle Group',
+    color: 'black',
     top: 10,
     height: 40,
-    left: 0
+    left: 10
 });
 
 var label2 = Titanium.UI.createLabel({
     text: 'Time',
-    top: 140,
+    color: 'black',
+    top: 135,
     height: 30,
     left: 10
 });
 
 var label3 = Titanium.UI.createLabel({
     text: 'Sets',
-    top: 140,
+    color: 'black',
+    top: 135,
     height: 30,
     left: 50
 });
 
 var label4 = Titanium.UI.createLabel({
     text: 'Reps',
-    top: 140,
+    color: 'black',
+    top: 135,
     height: 30,
     left: 90
 });
 var label5 = Titanium.UI.createLabel({
     text: 'Weight',
-    top: 140,
+    color: 'black',
+    top: 135,
     height: 30,
     left: 130
 });
@@ -55,8 +60,9 @@ var submit = $.UI.create('Button', {
 // create a dropdown list
 var picker = Ti.UI.createPicker({
 	top: 55, 
-	height: 40,
-	left: 0 
+	height: 35,
+	left: 10,
+	backgroundColor: '#939393' 
 });
 
 var time = 0;
@@ -228,7 +234,7 @@ var nameField = Ti.UI.createTextField({
 	color: '#336699',
 	hintText: 'Exercise name',
 	height: 35,
-	top: 175,
+	top: 170,
 	width: '100%',
 });
 

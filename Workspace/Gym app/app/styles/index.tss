@@ -1,5 +1,5 @@
 ".container": {
-	backgroundColor:"black"
+	backgroundColor:"#F2F2F2"
 }
 
 "button": {
