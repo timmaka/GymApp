@@ -1,0 +1,15 @@
+function newWorkout (e)
+{
+	Titanium.UI.createWindow({
+        title:"Muscle groups",
+        backgroundColor:'#000000',
+    	layout:'vertical',
+        url: 'select.js'
+    });
+}
+function pastWorkouts (e)
+{
+	
+}
+
+$.index.open();

@@ -1,0 +1,10 @@
+function newWorkout (e)
+{
+	var selectWin = Alloy.createController('select').getView;    
+}
+function pastWorkouts (e)
+{
+	
+}
+
+$.index.open();

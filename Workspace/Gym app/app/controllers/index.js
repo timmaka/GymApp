@@ -1,166 +1,93 @@
-var mainWin = Titanium.UI.createWindow({
-    backgroundColor:'#B2B2B2',
-    layout:'vertical'
-});
- 
-var exercisesWin = Titanium.UI.createWindow({
-    backgroundColor:'#B2B2B2',
-    layout:'vertical'
-});
-var exercisesview = Titanium.UI.createScrollView({
-    scrollType:"vertical",
-    left:'0dp',
-    width:'100%'
-});
+// clear built in database
+var Tdb = Ti.Database.open ('_alloy_');
+Tdb.execute ('DROP TABLE IF EXISTS workouts');
+Tdb.close ();
 
-var formsWin = Titanium.UI.createWindow({
-    backgroundColor:'#B2B2B2',
-    layout:'vertical'
-});
-var formsview = Titanium.UI.createScrollView({
-    scrollType:"vertical",
-    left:'0dp',
-    width:'100%'
-});
+// WORK IN PROGRESS TO MAKE INDEX DYNAMIC AND TO STORE THE WORKOUT ID THAT IS PROGRESS
+// SO THAT THE APP CAN BE CLOSED WHILE THE WORKOUT IS IN PROGRESS
+// // create a window and view for muscle groups
+// var indexWin = Titanium.UI.createWindow({
+    // backgroundColor:'#000000',
+    // layout:'vertical',
+    // title: 'Gym App'
+// });
+// 
+// var indexView = Titanium.UI.createScrollView({
+    // scrollType:"vertical",
+    // left:'0dp',
+    // width:'100%'
+// });
 
-var groupview = Titanium.UI.createScrollView({
-    scrollType:"vertical",
-    left:'0dp',
-    width:'100%'
-});
- 
-var workout_id = 1;
-var btnHeight = 50;
-var db = Ti.Database.install('/database.db', 'dymdatabase');
-var groups = db.execute('SELECT * FROM groups');
-var i = 0;
-while (groups.isValidRow())
+// var newBut = $.UI.create('Button', {
+    // top: 10 + k * 60,
+    // title: 'New Workout',
+    // id: 'button'
+// });
+// 
+// var continueBut = $.UI.create('Button', {
+    // top: 10 + k * 60,
+    // title: 'Continue Workout',
+    // id: 'button'
+// });
+// 
+// var pastBut = $.UI.create('Button', {
+    // top: 10 + k * 60,
+    // title: 'Past Workouts',
+    // id: 'button'
+// });
+// 
+// var addBut = $.UI.create('Button', {
+    // top: 10 + k * 60,
+    // title: 'Add exercise',
+    // id: 'button'
+// });
+
+// open the database
+var db = Ti.Database.install('/database.db', 'gymdatabase');
+
+var workout_id;
+	
+function newWorkout (e)
 {
-	groupview.add(Titanium.UI.createButton({
-		backgroundColor: '#3333FF',
-		color: '#FFFFFF',
-	    width:'100%',
-	    top: 10 + i * (btnHeight + 10),
-	    height: btnHeight,
-	    numId: groups.fieldByName('id'),
-	    title: groups.fieldByName('name'),
-	}));
-	groups.next();
-	i++;
-}
-var exercise_buttons = [];
-groups.close();
-groupview.addEventListener('click', function (e) {
-	if (e.source.title != null)
+
+	// get the last workouts id
+	var workout_info = db.execute('SELECT id FROM workouts ORDER BY id DESC LIMIT 1');
+	
+    // set an id for the new workout
+	if (workout_info.isValidRow())
 	{
-		var exercises = db.execute("SELECT * FROM list where muscle_group = ?", e.source.title);
-		var k = 0;
-		for (i = 0; i < exercise_buttons.length; i++)
-		{
-			exercisesview.remove(exercise_buttons[i]);
-		}
-		while (exercises.isValidRow())
-		{
-			var button = Titanium.UI.createButton({
-				backgroundColor: '#3333FF',
-				color: '#FFFFFF',
-			    width:'100%',
-			    top: 10 + k * (btnHeight + 10),
-			    height:btnHeight,
-			    numId:exercises.fieldByName('id'),
-			    title: exercises.fieldByName('name'),
-			});
-			exercise_buttons.push(button);
-			exercisesview.add(button);
-			exercises.next();
-			k++;
-		}
-		var forms = [];
-		exercisesview.addEventListener('click', function(e) {
-			if (e.source.title != null)
-			{
-				var exercise_name = e.source.title;
-				var chosen = db.execute("SELECT * FROM list where name = ?", e.source.title);
-				var p = 0;
-				for (i = 0; i < forms.length; i++)
-				{
-					formsview.remove(forms[i]);
-				}
-				
-				var options = ['time', 'sets', 'reps', 'weight'];
-				for (z = 0; z < options.length; z++)
-				{
-					if (chosen.fieldByName(options[z]) == 1)
-					{
-						var field = Ti.UI.createTextField({
-							keyboardType:Titanium.UI.KEYBOARD_NUMBER_PAD,
-  							color: '#336699',
-							hintText: options[z],
-							height: 35,
-							top: 10 + 45 * p,
-							width: '100%',
-						});
-						forms.push(field);
-						formsview.add(field);
-						p++;
-					}
-				}
-				var submit = Titanium.UI.createButton({
-					backgroundColor: '#3333FF',
-					color: '#FFFFFF',
-				    width:'100%',
-				    top: 10 + p * 45,
-				    height:btnHeight,
-				    title: 'Submit',
-				});
-				submit.addEventListener('click', function (e) {
-					for (i = 0; i < forms.length; i++)
-					{
-						if (forms[i].getValue() == '')
-						{
-							alert("All fields aren't filled");
-							break;
-						}
-					}
-					var query = "INSERT INTO workout_info (exercise, workout_id, ";
-					for (i = 0; i < forms.length; i++)
-					{
-						query = query.concat(forms[i].hintText);
-						if (i+1 != forms.length)
-						{
-							query = query.concat(", ");
-						}
-					}
-					query = query.concat(") VALUES (");
-					query = query.concat("'" + exercise_name + "'");
-					query = query.concat(", ");
-					query = query.concat(workout_id);
-					query = query.concat(", ");
-					for (i = 0; i < forms.length; i++)
-					{
-						query = query.concat(forms[i].getValue());
-						if (i+1 != forms.length)
-						{
-							query = query.concat(", ");
-						}
-					}
-					query = query.concat(")");
-					db.execute(query);
-					formsWin.close();
-					exercisesWin.close();
-				});
-				formsview.add(submit);
-				chosen.close();
-				formsWin.add(formsview);
-				formsWin.open();
-			}
-		});
-		exercises.close();
-		exercisesWin.add(exercisesview);
-		exercisesWin.open();
+		workout_id = workout_info.fieldByName('id') + 1;	
 	}
-});
+	else
+	{
+		workout_id = 1;
+	}
+	
+	// open the select window passing the database into it
+	var selectWin = Alloy.createController('select', {db:db, workout_id: workout_id}).getView(); 
+}
+function resume (e)
+{
+	if (typeof workout_id == 'undefined')
+	{
+		alert ("You haven't started a workout yet!");
+	}
+	else
+	{
+		// open the select window passing the database into it
+		var selectWin = Alloy.createController('select', {db:db, workout_id: workout_id}).getView(); 
+	}
+}
 
-mainWin.add(groupview);
-mainWin.open();
+function pastWorkouts (e)
+{
+	var pastView = Alloy.createController('past', {db:db}).getView();
+}
 
+function addexercise (e)
+{
+	var addView = Alloy.createController('add', {db:db}).getView();
+}
+
+// open the index window
+$.index.open();
