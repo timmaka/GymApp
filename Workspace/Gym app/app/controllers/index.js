@@ -1,3 +1,5 @@
+// Tim M was here
+
 // clear built in database
 var Tdb = Ti.Database.open ('_alloy_');
 Tdb.execute ('DROP TABLE IF EXISTS workouts');
